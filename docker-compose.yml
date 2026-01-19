@@ -1,0 +1,14 @@
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_APP=app.app
+      - FLASK_ENV=development
+      # Uncomment to use a different DB (example for SQLite inside container)
+      # - DATABASE_URL=sqlite:///db/budget.db
+    volumes:
+      - .:/app
+      - ./db:/app/db
+    restart: unless-stopped
