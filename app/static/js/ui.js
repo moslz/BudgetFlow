@@ -6,14 +6,14 @@ export function setStatus(message) {
     statusEl.textContent = message || '';
 }
 
-export function renderTable(expenses) {
+export function renderTable(expenses, currency = '$') {
     tbody.innerHTML = '';
     for (const e of expenses) {
         const tr = document.createElement('tr');
         tr.innerHTML = `
       <td>${e.date}</td>
       <td>${e.category}</td>
-      <td class="num">${Number(e.amount).toFixed(2)}</td>
+      <td class="num">${currency}${Number(e.amount).toFixed(2)}</td>
       <td>${e.note || ''}</td>
       <td>
           <button data-id="${e.id}" class="btn btn--danger btn--sm delete">Delete</button>

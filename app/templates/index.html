@@ -22,11 +22,12 @@
           </div>
           <div class="row">
             <label for="category">Category</label>
-            <input type="text" id="category" name="category" placeholder="Groceries" required />
+            <input type="text" id="category" name="category" list="category-list" placeholder="Groceries" required />
+            <datalist id="category-list"></datalist>
           </div>
           <div class="row">
-            <label for="amount">Amount</label>
-            <input type="number" id="amount" name="amount" step="0.01" min="0" required />
+            <label for="amount">Amount (€)</label>
+            <input type="number" id="amount" name="amount" step="0.01" min="0" placeholder="0.00" required />
           </div>
           <div class="row">
             <label for="note">Note</label>
@@ -53,6 +54,21 @@
           <tbody></tbody>
         </table>
         <div id="empty" class="muted" hidden>No expenses yet.</div>
+      </section>
+
+      <section class="card">
+        <h2>Settings</h2>
+        <div class="row">
+          <label for="currency-select">Currency</label>
+          <select id="currency-select">
+            <option value="€">Euro (€)</option>
+            <option value="$">US Dollar ($)</option>
+            <option value="£">British Pound (£)</option>
+            <option value="¥">Japanese Yen (¥)</option>
+          </select>
+          <button id="save-settings" class="btn btn--primary">Save</button>
+        </div>
+        <div id="settings-status" class="muted" hidden></div>
       </section>
     </main>
 

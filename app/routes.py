@@ -1,8 +1,56 @@
 from flask import Blueprint, request, jsonify
 from .models import db, Expense
+import json
+import os
 
 
 api_bp = Blueprint('api', __name__)
+
+SETTINGS_FILE = os.path.join(os.path.dirname(__file__), '..', 'settings.json')
+
+def get_settings_data():
+    if os.path.exists(SETTINGS_FILE):
+        with open(SETTINGS_FILE, 'r') as f:
+            return json.load(f)
+    return {'currency': '€'}
+
+def save_settings_data(data):
+    with open(SETTINGS_FILE, 'w') as f:
+        json.dump(data, f)
+
+DEFAULT_CURRENCY = '€'
+
+DEFAULT_CATEGORIES = [
+    'Groceries',
+    'Transport',
+    'Entertainment',
+    'Utilities',
+    'Dining Out',
+    'Healthcare',
+    'Shopping',
+    'Bills',
+    'Other'
+]
+
+
+@api_bp.route('/categories', methods=['GET'])
+def get_categories():
+    return jsonify(DEFAULT_CATEGORIES)
+
+
+@api_bp.route('/settings', methods=['GET'])
+def get_settings():
+    return jsonify(get_settings_data())
+
+
+@api_bp.route('/settings', methods=['PUT'])
+def update_settings():
+    payload = request.get_json() or {}
+    current = get_settings_data()
+    if 'currency' in payload:
+        current['currency'] = payload['currency']
+    save_settings_data(current)
+    return jsonify(current)
 
 
 @api_bp.route('/expenses', methods=['GET'])

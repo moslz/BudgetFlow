@@ -1,11 +1,13 @@
-import { getExpenses, createExpense, removeExpense } from './api.js';
+import { getExpenses, createExpense, removeExpense, getCategories, getSettings, updateSettings } from './api.js';
 import { renderTable, setStatus } from './ui.js';
+
+let currencySymbol = '$'; // default fallback
 
 async function refreshExpenses() {
     try {
         setStatus('Loading…');
         const data = await getExpenses();
-        renderTable(data);
+        renderTable(data, currencySymbol);
         setStatus(data.length ? `${data.length} item(s)` : 'No expenses yet');
     } catch (err) {
         setStatus(`Error: ${err.message}`);
@@ -47,8 +49,72 @@ function setupDeleteButtons() {
     });
 }
 
+async function loadCategories() {
+    try {
+        const categories = await getCategories();
+        const datalist = document.getElementById('category-list');
+        categories.forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat;
+            datalist.appendChild(option);
+        });
+    } catch (err) {
+        console.error('Failed to load categories:', err);
+    }
+}
+
+async function loadSettings() {
+    try {
+        const settings = await getSettings();
+        currencySymbol = settings.currency;
+        // Update form label
+        const amountLabel = document.querySelector('label[for="amount"]');
+        if (amountLabel) {
+            amountLabel.textContent = `Amount (${currencySymbol})`;
+        }
+        // Update currency select
+        const currencySelect = document.getElementById('currency-select');
+        if (currencySelect) {
+            currencySelect.value = currencySymbol;
+        }
+    } catch (err) {
+        console.error('Failed to load settings:', err);
+    }
+}
+
+function setupSettings() {
+    const saveBtn = document.getElementById('save-settings');
+    const statusEl = document.getElementById('settings-status');
+    const currencySelect = document.getElementById('currency-select');
+
+    saveBtn.addEventListener('click', async () => {
+        try {
+            statusEl.hidden = true;
+            const newCurrency = currencySelect.value;
+            const updated = await updateSettings({ currency: newCurrency });
+            currencySymbol = updated.currency;
+            // Update label
+            const amountLabel = document.querySelector('label[for="amount"]');
+            if (amountLabel) {
+                amountLabel.textContent = `Amount (${currencySymbol})`;
+            }
+            // Refresh table with new currency
+            await refreshExpenses();
+            statusEl.textContent = 'Settings saved!';
+            statusEl.hidden = false;
+            setTimeout(() => statusEl.hidden = true, 3000);
+        } catch (err) {
+            statusEl.textContent = `Error: ${err.message}`;
+            statusEl.hidden = false;
+        }
+    });
+}
+
 window.addEventListener('DOMContentLoaded', () => {
     setupForm();
     setupDeleteButtons();
+    setupSettings();
+    loadSettings();
+    loadCategories();
     refreshExpenses();
 });

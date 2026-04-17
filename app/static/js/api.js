@@ -4,6 +4,28 @@ export async function getExpenses() {
     return res.json();
 }
 
+export async function getCategories() {
+    const res = await fetch('/api/categories');
+    if (!res.ok) throw new Error('Failed to load categories');
+    return res.json();
+}
+
+export async function getSettings() {
+    const res = await fetch('/api/settings');
+    if (!res.ok) throw new Error('Failed to load settings');
+    return res.json();
+}
+
+export async function updateSettings(settings) {
+    const res = await fetch('/api/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings),
+    });
+    if (!res.ok) throw new Error('Failed to update settings');
+    return res.json();
+}
+
 export async function createExpense(payload) {
     const res = await fetch('/api/expenses', {
         method: 'POST',
